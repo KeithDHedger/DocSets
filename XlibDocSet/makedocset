@@ -1,0 +1,94 @@
+#!/bin/bash
+
+#
+#©K. D. Hedger. Tue 30 Jul 14:29:46 BST 2024 keithdhedger@gmail.com
+#
+#This file (makedocset) is part of MakeXLibDocset.
+#
+#MakeXLibDocset is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#MakeXLibDocset is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with MakeXLibDocset.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+CWD=$(pwd)
+ICONPATH=${ICONPATH:-"./xlib.png"}
+SOURCEHTML=${SOURCEHTML:-"html"};
+DOCSET_NAME=${DOCSET_NAME:-"XLib"}
+
+DOCSET_FULL_NAME="${DOCSET_NAME}.docset"
+DOCSET_CONTENTS=${DOCSET_FULL_NAME}/Contents
+DOCSET_RESOURCES=${DOCSET_CONTENTS}/Resources
+DOCSET_DOCUMENTS=${DOCSET_RESOURCES}/Documents
+DESTDIR=${DESTDIR:-~/.local/share/Zeal/Zeal/docsets}
+
+export DESTDIR SOURCEHTML DOCSET_NAME DOCSET_FULL_NAME DOCSET_CONTENTS DOCSET_RESOURCES DOCSET_DOCUMENTS 
+mkdir -p ${DESTDIR}/${DOCSET_DOCUMENTS}
+cp Info.plist ${DESTDIR}/${DOCSET_CONTENTS}
+sed -i "s|@@NAME@@|${DOCSET_NAME}|g" ${DESTDIR}/${DOCSET_CONTENTS}/Info.plist
+
+if [[ -f "$ICONPATH" ]];then
+	convert "$ICONPATH" -resize 16x16 ${DESTDIR}/${DOCSET_FULL_NAME}/icon.png
+	convert "$ICONPATH" -resize 32x32 ${DESTDIR}/${DOCSET_FULL_NAME}/icon@2x.png
+fi
+
+./getresources
+
+mv html/xlib/* html ||true
+rmdir html/xlib
+
+pushd ${SOURCEHTML} &>/dev/null
+	echo "Copying files ..."
+	tar --exclude ${DOCSET_FULL_NAME} --exclude xlib-manual.tar.gz --exclude robots.txt -c -f - . | (cd ${DESTDIR}/${DOCSET_DOCUMENTS}; tar xf -)
+popd &>/dev/null
+
+pushd ${DESTDIR}/${DOCSET_RESOURCES}
+	ln -sv Documents/*.gif .
+popd
+
+:>Tokens.xml
+
+echo -e '<?xml version="1.0" encoding="UTF-8"?>\n' >>Tokens.xml
+echo -e '<Tokens version="1.0">\n' >>Tokens.xml
+
+./getsections >> Tokens.xml
+./getfunctions >> Tokens.xml
+./gettypes >> Tokens.xml
+./getstructs >> Tokens.xml
+./getmasks >> Tokens.xml
+
+echo -e '</Tokens>\n' >>Tokens.xml
+
+cp Tokens.xml ${DESTDIR}/${DOCSET_RESOURCES}
+pushd ${DESTDIR}/${DOCSET_RESOURCES} &>/dev/null
+	rm docSet.dsidx||true
+	sqlite3 docSet.dsidx <<'END_SQL'
+CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);
+CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);
+END_SQL
+
+	echo "Building DB ..."
+	while read
+		do
+			unset Name Type Path Anchor
+			if eval "$REPLY" 2>/dev/null;then
+				FILEPATH=${Path}
+				if [[ ! "X${Anchor}" = "X" ]];then
+					FILEPATH="${FILEPATH}#${Anchor}"
+				fi
+				echo "Adding $Name ..."
+				sqlite3 docSet.dsidx  "insert into searchindex (name,type,path) values ('$Name','$Type','$FILEPATH');"
+			fi
+		done< <(${CWD}/tagreader Tokens.xml Token Name Type Path Anchor)
+	rm Tokens.xml
+popd &>/dev/null
+
+rm Tokens.xml

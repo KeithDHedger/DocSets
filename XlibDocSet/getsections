@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+#©K. D. Hedger. Tue 30 Jul 14:31:30 BST 2024 keithdhedger@gmail.com
+#
+#This file (getsections) is part of MakeXLibDocset.
+#
+#MakeXLibDocset is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#MakeXLibDocset is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with MakeXLibDocset.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+while read
+	do
+			NAME="$(echo ${REPLY}| awk -F'/' '{print $(NF -1)}')"	
+			if [[ ! "X$NAME" = "X" ]] && [[ ! "X$NAME" = "Xch@tronche.com" ]];then
+				echo "Found Section ${NAME}..." >&2
+				echo -e "<Token>"
+				echo -e "	<Name>$NAME</Name>"
+				echo -e "	<Type>Section</Type>"
+				echo -e "	<Path>$REPLY</Path>"
+				echo -e "</Token>"
+			fi
+	done< <(find html -mindepth 2 -iname "index.html"|cut -c 6-)

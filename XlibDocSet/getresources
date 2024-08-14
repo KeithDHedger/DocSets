@@ -1,0 +1,30 @@
+#!/bin/bash -e
+#
+#©K. D. Hedger. Tue 30 Jul 14:29:31 BST 2024 keithdhedger@gmail.com
+#
+#This file (getresources) is part of MakeXLibDocset.
+#
+#MakeXLibDocset is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#MakeXLibDocset is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with MakeXLibDocset.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+if [[ ! -e ./tagreader ]];then
+	g++ tagreader.cpp $(pkg-config --cflags --libs Qt5Core) -fPIC -o tagreader
+fi
+
+if [[ ! -e html ]];then
+	mkdir html
+	pushd html
+		wget --recursive --no-host-directories --no-parent -k -p -E --cut-dirs=2 https://tronche.com/gui/x/xlib/
+	popd
+fi

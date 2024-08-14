@@ -1,0 +1,140 @@
+#!/bin/bash
+#
+#©K. D. Hedger. Tue 30 Jul 14:32:07 BST 2024 keithdhedger@gmail.com
+#
+#This file (getstructs) is part of MakeXLibDocset.
+#
+#MakeXLibDocset is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#MakeXLibDocset is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with MakeXLibDocset.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+while read
+	do
+		RAWDATA="$(echo $REPLY|grep -o -i '<a.*</a>')"
+		if [[ ! "X$RAWDATA" = "X" ]];then
+			FILEFULL="$(echo $RAWDATA|sed -n 's|.*href="\(.*\)".*|events/\1|pI')"
+			FILE="$(echo $FILEFULL|awk -F'#' '{print $1}')"
+			ANCHOR="$(echo $FILEFULL|awk -F'#' '{print $2}')"
+			NAME="$(echo $RAWDATA|sed -n 's|.*">\(.*\)</a>.*|\1|pI')"
+			if [[ ! "X$NAME" = "X" ]] && [[ ! "X$NAME" = "Xch@tronche.com" ]];then
+				echo "Found Structure ${NAME}..." >&2
+				echo -e "<Token>"
+				echo -e "	<Name>$NAME</Name>"
+				echo -e "	<Type>Struct</Type>"
+				echo -e "	<Path>$FILE</Path>"
+				echo -e "	<Anchor>$ANCHOR</Anchor>"
+				echo -e "</Token>"
+			fi
+		fi
+	done< <(cat ${SOURCEHTML}/events/structures.html)
+
+#extra additions
+echo "<Token>"
+echo "	<Name>XVisualInfo</Name>"
+echo "	<Type>Struct</Type>"
+echo "	<Path>utilities/visual.html#XVisualInfo</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>XSetWindowAttributes</Name>"
+echo "	<Type>Struct</Type>"
+echo "	<Path>window/attributes/index.html</Path>"
+echo "	<Anchor>XSetWindowAttributes</Anchor>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>background-pixmap</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/background.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>background-pixel</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/background.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>border-pixel</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/border.html</Path>"
+echo "	<Anchor></Anchor>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>bit-gravity</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/gravity.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>win-gravity</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/gravity.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>backing-store</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/backing-store.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>backing-planes</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/backing.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>backing-pixel</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/backing.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>save-under</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/save-under.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>event-mask</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/event-and-do-not-propagate.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>do-not-propagate-mask</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/event-and-do-not-propagate.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>override-redirect</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/override-redirect.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>colormap</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/colormap.html</Path>"
+echo "</Token>"
+
+echo "<Token>"
+echo "	<Name>cursor</Name>"
+echo "	<Type>Attribute</Type>"
+echo "	<Path>window/attributes/cursor.html</Path>"
+echo "</Token>"
+
+

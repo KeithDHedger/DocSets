@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+#©K. D. Hedger. Tue 30 Jul 14:34:42 BST 2024 keithdhedger@gmail.com
+#
+#This file (getmasks) is part of MakeXLibDocset.
+#
+#MakeXLibDocset is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#MakeXLibDocset is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with MakeXLibDocset.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+while read
+	do
+		RAWDATA="$(echo $REPLY|grep -o -i '<a.*</a>')"
+		if [[ ! "X$RAWDATA" = "X" ]];then
+			FILEFULL="$(echo $RAWDATA|sed -n 's|.*href="\(.*\)".*|events/\1|pI')"
+			FILE="$(echo $FILEFULL|awk -F'#' '{print $1}')"
+			ANCHOR="$(echo $FILEFULL|awk -F'#' '{print $2}')"
+			NAME="$(echo $RAWDATA|sed -n 's|.*">\(.*\)</a>.*|\1|pI')"
+			if [[ ! "X$NAME" = "X" ]] && [[ ! "X$NAME" = "Xch@tronche.com" ]];then
+				echo "Found Constant ${NAME}..." >&2
+				echo -e "<Token>"
+				echo -e "	<Name>$NAME</Name>"
+				echo -e "	<Type>Constant</Type>"
+				echo -e "	<Path>$FILE</Path>"
+				echo -e "	<Anchor>$ANCHOR</Anchor>"
+				echo -e "</Token>"
+			fi
+		fi
+	done< <(cat ${SOURCEHTML}/events/mask.html)
