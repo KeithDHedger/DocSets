@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#
+#©K. D. Hedger. Sun 11 Aug 17:28:20 BST 2024 keithdhedger@gmail.com
+#
+#This file (createdocset) is part of docsets.
+#
+#docsets is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#docsets is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with docsets.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+if [[ ! -e "./docsfromdev" ]];then
+	g++ "docsfromdev.cpp" LFSTKUtilityClass.cpp -lsqlite3 -o "docsfromdev"
+fi
+
+ICONPATH=${ICONPATH:-"./LFSTux.png"}
+SOURCEHTML=${SOURCEHTML:-"./html"};
+DOCSET_NAME=${DOCSET_NAME:-"MyDocSet"}
+
+DOCSET_NAME="${DOCSET_NAME}.docset"
+DOCSET_CONTENTS=${DOCSET_NAME}/Contents
+DOCSET_RESOURCES=${DOCSET_CONTENTS}/Resources
+DOCSET_DOCUMENTS=${DOCSET_RESOURCES}/Documents
+DOCSETOP=${DOCSETOP:-~/.local/share/Zeal/Zeal/docsets}
+
+mkdir -p ${DOCSETOP}/${DOCSET_DOCUMENTS}
+cp ./Info.plist ${DOCSETOP}/${DOCSET_CONTENTS}
+sed -i "s/@@OXOX@@/${DOCSET_NAME}/g" ${DOCSETOP}/${DOCSET_CONTENTS}/Info.plist 
+
+if [[ -f "$ICONPATH" ]];then
+	convert "$ICONPATH" -resize 16x16 ${DOCSETOP}/${DOCSET_NAME}/icon.png
+	convert "$ICONPATH" -resize 32x32 ${DOCSETOP}/${DOCSET_NAME}/icon@2x.png
+fi
+
+pushd ${SOURCEHTML} &>/dev/null
+	echo "Copying files ..."
+	tar --exclude ${DOCSET_NAME} -c -f - . | (cd ${DOCSETOP}/${DOCSET_DOCUMENTS}; tar xf -)
+popd &>/dev/null
+
+rm ${DOCSETOP}/${DOCSET_RESOURCES}/docSet.dsidx||true
+
+VERBOSE=${VERBOSE:-""}
+
+echo -en "\e[?25l"
+echo "Building DB ..."
+./docsfromdev "${DOCSETOP}/${DOCSET_DOCUMENTS}/"*.devhelp2 "${DOCSETOP}/${DOCSET_RESOURCES}/docSet.dsidx" $VERBOSE
+echo -en "\e[?25h"
