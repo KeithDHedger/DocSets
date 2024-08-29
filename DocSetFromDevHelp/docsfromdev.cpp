@@ -68,7 +68,6 @@ void setTheType()
 	if(pos!=std::string::npos)
 		{
 			thetype=thetype.substr(6,pos-6);
-				fprintf(stderr,">>>name=%s type=%s len=%i<<<\n",thename.c_str(),thetype.c_str(),thetype.length());
 			if(thetype.compare("typedef")==0)
 				thetype="Type";
 			else if(thetype.length()>0)
