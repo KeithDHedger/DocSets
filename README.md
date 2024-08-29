@@ -30,9 +30,9 @@ The documentation will automatically be downloaded, if you already have the docs
 make install QT6DOCS=/usr/share/doc/qt6 QT5DOCS=/usr/share/doc/qt5 2>/dev/null
 ```
 DocSetFromDevHelp:<br>
-To ( for instance ) create a docset from installed cairo gtk-docs:<br>
+To ( for instance ) create a docset from installed cairo gtk-docs with custom icon:<br>
 ```console
-DOCSET_NAME="cairo" SOURCEHTML=/usr/share/gtk-doc/html/cairo ./createdocset
+DOCSET_NAME="cairo" SOURCEHTML=/usr/share/gtk-doc/html/cairo ICONPATH=/tmp/cairoicon.png ./createdocset
 ```
 To ( for instance ) create a docset from installed harfbuzz gtk-docs, show entries and not installing:
 ```console
