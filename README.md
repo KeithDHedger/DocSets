@@ -18,7 +18,7 @@ Files are automatically copied to~/.local/share/Zeal/Zeal/docsets<br>
 See the README.md file.<br>
 <br>
 <br>
-Qt5And6Docsets:
+Qt5And6Docsets:<br>
 The 'official' qt5/6 docsets downloadable via zeal are out of date.
 Just run:
 ```console
@@ -29,14 +29,11 @@ The documentation will automatically be downloaded, if you already have the docs
 ```console
 make install QT6DOCS=/usr/share/doc/qt6 QT5DOCS=/usr/share/doc/qt5 2>/dev/null
 ```
-<br>
-DocSetFromDevHelp:
+DocSetFromDevHelp:<br>
 To ( for instance ) create a docset from installed cairo gtk-docs:<br>
-
 ```console
 DOCSET_NAME="cairo" SOURCEHTML=/usr/share/gtk-doc/html/cairo ./createdocset
 ```
-
 To ( for instance ) create a docset from installed harfbuzz gtk-docs, show entries and not installing:
 ```console
 DOCSET_NAME="harfbuzz" SOURCEHTML=/usr/share/gtk-doc/html/harfbuzz DOCSETOP="/tmp/docs" VERBOSE=1 ./createdocset
