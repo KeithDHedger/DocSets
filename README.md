@@ -32,6 +32,7 @@ make install QT6DOCS=/usr/share/doc/qt6 QT5DOCS=/usr/share/doc/qt5 2>/dev/null
 <br>
 DocSetFromDevHelp:
 To ( for instance ) create a docset from installed cairo gtk-docs:
+
 ```console
 DOCSET_NAME="cairo" SOURCEHTML=/usr/share/gtk-doc/html/cairo ./createdocset
 ```
